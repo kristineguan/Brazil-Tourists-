@@ -15,13 +15,21 @@ shinyUI(fluidPage(
                   "Number of bins in histogram:",
                   min = 1,
                   max = 30,
-                  value = 15)
+                  value = 15),
+      sliderInput('time',
+                  'Year range',
+                  sep = "",
+                  min=1989,
+                  max=2015,
+                  value=c(1989,2015)
+                  )
     ),
 
     # Show a plot of the generated distribution
     mainPanel(
       tabsetPanel(type='tab',
-                  tabPanel('Data(First 20 rows)',tableOutput('data')),
+                  tabPanel('Dataset Sample',tableOutput('data')),
+                  tabPanel('Data Summary',verbatimTextOutput('summary')),
                   tabPanel('Distribution',plotOutput("distPlot"))
     )
   )
