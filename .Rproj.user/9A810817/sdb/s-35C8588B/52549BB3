@@ -1,0 +1,17 @@
+{
+    "contents" : "library(shiny)\nlibrary(tseries)\nlibrary(timeDate)\nlibrary(timeSeries)\nlibrary(fBasics)\nlibrary(zoo)\nlibrary(fUnitRoots)\nlibrary(plyr)\n\nshinyServer(function(input, output) {\n\n  output$histPlot <- renderPlot({\n    #Import and Head Dataset\n    myd=read.table(\"touristDataTransClean.csv\",header=T, sep=',') \n    head(myd)\n    #Extract Time Data(Year,Month,Count)\n    TimeData = myd[,5:7]\n    dataframe = as.data.frame(TimeData)\n    TS=ddply(dataframe, .(Year, Month), numcolwise(sum))\n\n    # draw the histogram with the specified number of bins\n    hist(TS$Count,\n         breaks=seq(1,max(TS$Count),l=input$bins+1)) \n      })\n})\n",
+    "created" : 1520212124402.000,
+    "dirty" : false,
+    "encoding" : "ISO8859-1",
+    "folds" : "",
+    "hash" : "2330473772",
+    "id" : "52549BB3",
+    "lastKnownWriteTime" : 1520212520,
+    "path" : "E:/personal project/R-Shiny/brazil tourists/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

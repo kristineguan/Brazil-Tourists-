@@ -1,0 +1,17 @@
+{
+    "contents" : "library(forecast)\nlibrary(ggplot2)\nlibrary(ggfortify)\nlibrary(ggplot2)\nlibrary(highcharter)\nlibrary(zoo)\nlibrary(tseries)\n\n\n###Using api()\napi_file <- \"https://blockchain.info/charts/market-price?timespan=365days&format=csv\"\ncsv_data <- read.csv(file=api_file, header = FALSE)\ncsv_df <- data.frame(csv_data)\n\n\n\ncsv_df$Close <- csv_df$V2\n\n\nedf  <- csv_df\n\ntail(edf)\nedf$v7_MA = ma(edf$Close, order=7)\n\n\n\n#STL  \nedf_ma <- ts(na.omit(edf$v7_MA), frequency=10)\ndecomp_edf <- stl(edf_ma, s.window=\"periodic\")\n#plot(decomp_rental)\nadj_edf <- seasadj(decomp_edf)\n\n\n\n\n#hfit<-HoltWinters(adj_edf)\n#hfit<-auto.arima(adj_edf)\nhfit<-tbats(adj_edf)\nf2<-forecast(hfit, h=(30*3))\n\ndf <- fortify(f2)\ndf$Data<-round(df$Data)\ndf$Fitted<-round(df$Fitted)\ndf$Index<-seq(as.Date(\"2016-12-26\"), (as.Date(\"2017-12-25\")+(30*(3))),length.out=length(df$Index))\n\n\nhighchart(type = \"stock\") %>% \n  hc_legend(enabled = TRUE) %>% \n  hc_title(text = \"Bitcoin Prediction using Prediction models\") %>% \n  hc_add_series(df, \"line\", hcaes(Index, Data), name = \"Actual Price\", color=\"black\") %>% \n  hc_add_series(df, \"line\", hcaes(Index, Fitted), name = \"Predicted Price\") %>%\n  hc_add_series(df, \"line\", hcaes(Index, `Point Forecast`), name = \"Forecasted Price\") %>% \n  hc_add_series(df, \"arearange\", hcaes(Index, low = `Lo 95`, high = `Hi 95`), name = \"Prediction Interval\") \n\n\n",
+    "created" : 1520207976681.000,
+    "dirty" : false,
+    "encoding" : "ISO8859-1",
+    "folds" : "",
+    "hash" : "973200075",
+    "id" : "F3B80F7E",
+    "lastKnownWriteTime" : 1514299080,
+    "path" : "E:/personal project/R-Shiny/time-series example/Bitcoin Prediction - TBATS.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

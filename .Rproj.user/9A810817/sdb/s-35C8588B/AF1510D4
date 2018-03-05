@@ -1,0 +1,17 @@
+{
+    "contents" : "\n# This is the user-interface definition of a Shiny web application.\n# You can find out more about building applications with Shiny here:\n#\n# http://shiny.rstudio.com\n#\n\nlibrary(shiny)\n\nshinyUI(fluidPage(\n\n  # Application title\n  titlePanel(\"Brazil Traveling Data\"),\n\n  # Sidebar with a slider input for number of bins\n  sidebarLayout(\n    sidebarPanel(\n      sliderInput(\"bins\",\n                  \"Number of bins:\",\n                  min = 1,\n                  max = 30,\n                  value = 15)\n    ),\n\n    # Show a plot of the generated distribution\n    mainPanel(\n      plotOutput(\"histPlot\")\n    )\n  )\n))\n",
+    "created" : 1520212122050.000,
+    "dirty" : false,
+    "encoding" : "ISO8859-1",
+    "folds" : "",
+    "hash" : "1592195603",
+    "id" : "AF1510D4",
+    "lastKnownWriteTime" : 1520212573,
+    "path" : "E:/personal project/R-Shiny/brazil tourists/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_source"
+}
