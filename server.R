@@ -1,13 +1,8 @@
 library(shiny)
-library(tseries)
-library(timeDate)
-library(timeSeries)
-library(fBasics)
-library(zoo)
-library(fUnitRoots)
+library(forecast)
 library(plyr)
-#Import and Head Dataset
-myd=read.table("touristDataTransClean.csv",header=T, sep=',') 
+#Import Dataset
+myd=read.table("E:/personal project/R-Shiny/Brazil Tourists/touristDataTransClean.csv",header=T, sep=',') 
 
 shinyServer(function(input, output) {
   output$data=renderTable(head(myd,20))
@@ -16,7 +11,7 @@ shinyServer(function(input, output) {
   output$summary=renderPrint({
     (summary(myd_sel()))
     })
-  
+  #--------------------------------
   #distribution plots by month/year
   output$distPlot=renderPlot({
     if (input$unit=='Month') {
@@ -25,7 +20,7 @@ shinyServer(function(input, output) {
       TS=ddply(myd_sel(), .(Year), numcolwise(sum))
     }
     
-    par(mfrow=c(3,2))
+    par(mfrow=c(4,2))
     # Time series plot
     if (input$unit=='Month') {
       ts_raw = ts((TS$Count/10000), start=c(min(TS$Year),1), freq=12)
@@ -63,7 +58,7 @@ shinyServer(function(input, output) {
          ylab = 'Probability',
          main = 'Histogram of Brazil Tourists Count (Log10)',
          freq=F)
-    xfit=seq(0,800,length=1000)
+    xfit=seq(0,10,length=1000)
     yfit=dnorm(xfit,mean=mean(log10(TS$Count)), sd=sd(log10(TS$Count)))
     lines(xfit, yfit, col="red")
     
@@ -73,6 +68,39 @@ shinyServer(function(input, output) {
     
     qqnorm(log10(TS$Count),main = 'Normal Q-Q Plot (Log10)')
     qqline(log10(TS$Count), col = 2)
-  
+    
+    # seasonal boxplot
+    if (input$unit=='Month') {
+      data=TS
+    boxplot(log10(TS$Count)~TS$Month,data=TS, 
+            main="Box-plot for Trourists Count by Month (Log10)", 
+            xlab="Month", 
+            ylab="Tourists Count by Month (Log10)"
+            )}
   })
+  #-------------------
+  #prediction
+  output$predPlot=renderPlot({
+    if (input$unit=='Month') {
+      TS=ddply(myd_sel(), .(Year,Month), numcolwise(sum))
+    } else {
+      TS=ddply(myd_sel(), .(Year), numcolwise(sum))
+    }
+    Log_10_Count=log10(TS$Count)
+    m1=auto.arima(Log_10_Count,ic="bic",trace=F,stationary=F,seasonal=TRUE)
+    m2=arima(Log_10_Count, order=c(2,1,4),seasonal=list(order=c(0,1,1),period=12), method="ML")
+    
+    if (input$model=='Auto select'){m=m1}
+    else{m=m2}
+    
+    f1=forecast.Arima(m,h=12)
+    f1$mean=10**(f1$mean)
+    f1$upper=10**(f1$upper)
+    f1$lower=10**(f1$lower)
+    f1$x=10**(f1$x)
+    f1$fitted = 10**(f1$fitted)
+    plot(f1,main="1-step Ahead Forecast")
+    #lines(fitted(f1),col="red")
+  })
+
     })

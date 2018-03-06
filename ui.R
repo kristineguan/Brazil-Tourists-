@@ -8,21 +8,24 @@ shinyUI(fluidPage(
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
-      selectInput('unit',
-                  'Trourists count by month/year',
-                  choices = c('Month','Year'),selected = 'Month'),
-      sliderInput("bins",
-                  "Number of bins in histogram:",
-                  min = 1,
-                  max = 30,
-                  value = 15),
+      radioButtons('unit',
+                  'Trourists count time unit',
+                  list('Month','Year'), selected = 'Month'),
       sliderInput('time',
                   'Year range',
                   sep = "",
                   min=1989,
                   max=2015,
                   value=c(1989,2015)
-                  )
+      ),
+      sliderInput("bins",
+                  "Number of bins in histogram:",
+                  min = 1,
+                  max = 30,
+                  value = 15),
+      radioButtons('model',
+                   'Select models',
+                   list('Auto select','Manually select'), selected = 'Manually select')
     ),
 
     # Show a plot of the generated distribution
@@ -30,7 +33,10 @@ shinyUI(fluidPage(
       tabsetPanel(type='tab',
                   tabPanel('Dataset Sample',tableOutput('data')),
                   tabPanel('Data Summary',verbatimTextOutput('summary')),
-                  tabPanel('Distribution',plotOutput("distPlot"))
+                  tabPanel('Distribution',plotOutput("distPlot",
+                                                     height='1000px',
+                                                     width = '800px')),
+                  tabPanel('Prediction',plotOutput('predPlot'))
     )
   )
 )))
