@@ -22,10 +22,11 @@ shinyUI(fluidPage(
                   "Number of bins in histogram:",
                   min = 1,
                   max = 30,
-                  value = 15),
-      radioButtons('model',
-                   'Select models',
-                   list('Auto select','Manually select'), selected = 'Manually select')
+                  value = 15)
+      #radioButtons('model',
+      #             'Select models',
+      #             list('Auto selected Model','Manually selected Model'), 
+      #             selected = 'Manually selected Model')
     ),
 
     # Show a plot of the generated distribution

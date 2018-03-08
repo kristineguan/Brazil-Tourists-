@@ -2,10 +2,10 @@ library(shiny)
 library(forecast)
 library(plyr)
 #Import Dataset
-myd=read.table("E:/personal project/R-Shiny/Brazil Tourists/touristDataTransClean.csv",header=T, sep=',') 
+myd=read.table("touristDataTransClean.csv",header=T, sep=',') 
 
 shinyServer(function(input, output) {
-  output$data=renderTable(head(myd,20))
+  output$data=renderTable(myd[1:10,])
   
   myd_sel=reactive({myd[myd$Year>=input$time[1] & myd$Year<=input$time[2],]})
   output$summary=renderPrint({
@@ -83,23 +83,33 @@ shinyServer(function(input, output) {
   output$predPlot=renderPlot({
     if (input$unit=='Month') {
       TS=ddply(myd_sel(), .(Year,Month), numcolwise(sum))
+      Log_10_Count=log10(TS$Count)
+      m=arima(Log_10_Count, order=c(2,1,4),seasonal=list(order=c(0,1,1),period=12), method="ML")
     } else {
       TS=ddply(myd_sel(), .(Year), numcolwise(sum))
+      Log_10_Count=log10(TS$Count)
+      m=auto.arima(Log_10_Count,ic="bic",trace=F,stationary=F,seasonal=F)
     }
-    Log_10_Count=log10(TS$Count)
-    m1=auto.arima(Log_10_Count,ic="bic",trace=F,stationary=F,seasonal=TRUE)
-    m2=arima(Log_10_Count, order=c(2,1,4),seasonal=list(order=c(0,1,1),period=12), method="ML")
+    #Log_10_Count=log10(TS$Count)
+    #m1=auto.arima(Log_10_Count,ic="bic",trace=F,stationary=F,seasonal=TRUE)
+    #m2=arima(Log_10_Count, order=c(2,1,4),seasonal=list(order=c(0,1,1),period=12), method="ML")
     
-    if (input$model=='Auto select'){m=m1}
-    else{m=m2}
+    if (input$unit=='Month'){h_=12}
+    else{h_=5}
     
-    f1=forecast.Arima(m,h=12)
+    f1=forecast.Arima(m,h=h_)
     f1$mean=10**(f1$mean)
     f1$upper=10**(f1$upper)
     f1$lower=10**(f1$lower)
     f1$x=10**(f1$x)
     f1$fitted = 10**(f1$fitted)
-    plot(f1,main="1-step Ahead Forecast")
+    if (input$unit=='Month'){
+      plot(f1,main="1-step Ahead Forecast")
+    }
+    else{
+      plot(f1,main="5-step Ahead Forecast")
+    }
+    
     #lines(fitted(f1),col="red")
   })
 
